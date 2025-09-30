@@ -5,7 +5,8 @@ metadata:
 spec:
   selector:
     app: django
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 8000
       targetPort: 8000
+

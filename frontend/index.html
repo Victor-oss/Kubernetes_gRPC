@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>React Hello</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body>
+    <div id="root">Loading...</div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <script>
+      const e = React.createElement;
+
+      function App() {
+        const [message, setMessage] = React.useState("Loading...");
+
+        React.useEffect(() => {
+          fetch("/api/hello/")
+            .then(r => r.json())
+            .then(data => setMessage(data.message))
+            .catch(err => setMessage("Error: " + err.message));
+        }, []);
+
+        return e('div', { style: { display: 'flex', justifyContent: 'center', marginTop: '2rem' } },
+          e('h1', null, message)
+        );
+      }
+
+      const container = document.getElementById('root');
+      ReactDOM.createRoot(container).render(e(App));
+    </script>
+  </body>
+</html>

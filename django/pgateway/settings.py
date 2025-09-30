@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",
-    "api",   # our app
+    "api",
 ]
 
 MIDDLEWARE = [
