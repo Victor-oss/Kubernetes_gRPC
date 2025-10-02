@@ -24,17 +24,17 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x05hello\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1d\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t2=\n\x07Greeter\x12\x32\n\x08SayHello\x12\x13.hello.HelloRequest\x1a\x11.hello.HelloReplyb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x08inverter\"\x1d\n\rInvertRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1e\n\x0bInvertReply\x12\x0f\n\x07message\x18\x01 \x01(\t2D\n\x08Inverter\x12\x38\n\x06Invert\x12\x17.inverter.InvertRequest\x1a\x15.inverter.InvertReplyb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'service_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_HELLOREQUEST']._serialized_start=24
-  _globals['_HELLOREQUEST']._serialized_end=52
-  _globals['_HELLOREPLY']._serialized_start=54
-  _globals['_HELLOREPLY']._serialized_end=83
-  _globals['_GREETER']._serialized_start=85
-  _globals['_GREETER']._serialized_end=146
+  _globals['_INVERTREQUEST']._serialized_start=27
+  _globals['_INVERTREQUEST']._serialized_end=56
+  _globals['_INVERTREPLY']._serialized_start=58
+  _globals['_INVERTREPLY']._serialized_end=88
+  _globals['_INVERTER']._serialized_start=90
+  _globals['_INVERTER']._serialized_end=158
 # @@protoc_insertion_point(module_scope)

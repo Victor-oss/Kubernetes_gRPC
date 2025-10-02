@@ -1,15 +1,15 @@
 syntax = "proto3";
 
-package hello;
+package inverter;
 
-service Greeter {
-  rpc SayHello (HelloRequest) returns (HelloReply);
+service Inverter {
+  rpc Invert (InvertRequest) returns (InvertReply);
 }
 
-message HelloRequest {
+message InvertRequest {
   string name = 1;
 }
 
-message HelloReply {
+message InvertReply {
   string message = 1;
 }

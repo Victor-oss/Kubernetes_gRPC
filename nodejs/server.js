@@ -12,15 +12,17 @@ const packageDef = protoLoader.loadSync(PROTO_PATH, {
   oneofs: true
 });
 const grpcObj = grpc.loadPackageDefinition(packageDef);
-const hello = grpcObj.hello;
+const inverter = grpcObj.inverter;
 
-function sayHello(call, callback) {
-  callback(null, { message: 'Teste gRPC' });
+function invert(call, callback) {
+  const input = call.request.name;
+  const reversed = input.split("").reverse().join("");
+  callback(null, { message: reversed });
 }
 
 function main() {
   const server = new grpc.Server();
-  server.addService(hello.Greeter.service, { SayHello: sayHello });
+  server.addService(inverter.Inverter.service, { Invert: invert });
   const addr = '0.0.0.0:50051';
   server.bindAsync(addr, grpc.ServerCredentials.createInsecure(), (err, port) => {
     if (err) {

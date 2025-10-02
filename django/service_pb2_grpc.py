@@ -25,7 +25,7 @@ if _version_not_supported:
     )
 
 
-class GreeterStub(object):
+class InverterStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,43 +34,43 @@ class GreeterStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.SayHello = channel.unary_unary(
-                '/hello.Greeter/SayHello',
-                request_serializer=service__pb2.HelloRequest.SerializeToString,
-                response_deserializer=service__pb2.HelloReply.FromString,
+        self.Invert = channel.unary_unary(
+                '/inverter.Inverter/Invert',
+                request_serializer=service__pb2.InvertRequest.SerializeToString,
+                response_deserializer=service__pb2.InvertReply.FromString,
                 _registered_method=True)
 
 
-class GreeterServicer(object):
+class InverterServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def SayHello(self, request, context):
+    def Invert(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_GreeterServicer_to_server(servicer, server):
+def add_InverterServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SayHello': grpc.unary_unary_rpc_method_handler(
-                    servicer.SayHello,
-                    request_deserializer=service__pb2.HelloRequest.FromString,
-                    response_serializer=service__pb2.HelloReply.SerializeToString,
+            'Invert': grpc.unary_unary_rpc_method_handler(
+                    servicer.Invert,
+                    request_deserializer=service__pb2.InvertRequest.FromString,
+                    response_serializer=service__pb2.InvertReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'hello.Greeter', rpc_method_handlers)
+            'inverter.Inverter', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('hello.Greeter', rpc_method_handlers)
+    server.add_registered_method_handlers('inverter.Inverter', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class Greeter(object):
+class Inverter(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def SayHello(request,
+    def Invert(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +83,9 @@ class Greeter(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/hello.Greeter/SayHello',
-            service__pb2.HelloRequest.SerializeToString,
-            service__pb2.HelloReply.FromString,
+            '/inverter.Inverter/Invert',
+            service__pb2.InvertRequest.SerializeToString,
+            service__pb2.InvertReply.FromString,
             options,
             channel_credentials,
             insecure,

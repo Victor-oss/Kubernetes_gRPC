@@ -2,8 +2,14 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>React Hello</title>
+    <title>Atividade Extraclasse PSPD 1</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+      }
+    </style>
   </head>
   <body>
     <div id="root">Loading...</div>
@@ -15,17 +21,41 @@
       const e = React.createElement;
 
       function App() {
-        const [message, setMessage] = React.useState("Loading...");
+        const [input, setInput] = React.useState("");
+        const [message, setMessage] = React.useState("");
 
-        React.useEffect(() => {
-          fetch("/api/hello/")
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          fetch("/api/invert/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: input })
+          })
             .then(r => r.json())
             .then(data => setMessage(data.message))
             .catch(err => setMessage("Error: " + err.message));
-        }, []);
+        };
 
-        return e('div', { style: { display: 'flex', justifyContent: 'center', marginTop: '2rem' } },
-          e('h1', null, message)
+        return e("div", 
+          { style:
+            { paddingTop: "2rem", 
+            textAlign: "center",
+            width: '100%', 
+            height: '100%',
+            backgroundColor: '#005C53',
+            color:'#0CF25D'
+          } },
+          e("h2", null, "Inverte Palavras (Servidor gRPC Node JS)"),
+          e("form", { onSubmit: handleSubmit },
+            e("input", {
+              value: input,
+              onChange: ev => setInput(ev.target.value),
+              placeholder: "Digite uma palavra",
+              style: { padding: "0.5rem", marginRight: "0.5rem" }
+            }),
+            e("button", { type: "submit" }, "Inverter")
+          ),
+          message && e("h2", null, "Resultado: " + message)
         );
       }
 

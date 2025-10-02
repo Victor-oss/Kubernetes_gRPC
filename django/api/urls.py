@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import hello
+from .views import invert
 
 urlpatterns = [
-    path("hello/", hello),
+    path("invert/", invert),
 ]
