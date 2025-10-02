@@ -28,17 +28,21 @@ minikube start
 eval $(minikube docker-env)
 ```
 
+Obs.: Caso você receba um erro do tipo "Unable to resolve the current Docker CLI...", dê o comando acima novamente até não retornar nenhuma mensagem de erro
+
 ### 3. Construir as imagens Docker
 
 ```shell
 docker build -t django-app:latest ./django
 docker build -t react-frontend:latest ./frontend
+docker build -t nodejs-node-server:latest ./nodejs
 ```
 
 ### 4. Carregar as imagens no Minikube
 ```shell
 minikube image load django-app:latest
 minikube image load react-frontend:latest
+minikube image load nodejs-node-server:latest
 ```
 
 ### 5. Aplicar os manifests do Kubernetes
@@ -48,6 +52,8 @@ kubectl apply -f kubernetes/django-deployment.yaml
 kubectl apply -f kubernetes/django-service.yaml
 kubectl apply -f kubernetes/frontend-deployment.yaml
 kubectl apply -f kubernetes/frontend-service.yaml
+kubectl apply -f kubernetes/nodejs-deployment.yaml
+kubectl apply -f kubernetes/nodejs-service.yaml
 ```
 
 6. Obter o IP do Minikube
@@ -58,6 +64,10 @@ minikube ip
 
 O frontend estará disponível neste IP.
 
+```
+http://<minikube-ip>:30081
+```
+
 ### 🛑 Como parar e remover a aplicação
 
 1. Deletar os recursos do Kubernetes
@@ -67,6 +77,8 @@ kubectl delete -f kubernetes/django-deployment.yaml
 kubectl delete -f kubernetes/django-service.yaml
 kubectl delete -f kubernetes/frontend-deployment.yaml 
 kubectl delete -f kubernetes/frontend-service.yaml
+kubectl delete -f kubernetes/nodejs-deployment.yaml
+kubectl delete -f kubernetes/nodejs-service.yaml
 ```
 
 2. Parar o Minikube
