@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-grpc-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-grpc-server
+  template:
+    metadata:
+      labels:
+        app: java-grpc-server
+    spec:
+      containers:
+        - name: java-grpc-server
+          image: java-server:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50052
