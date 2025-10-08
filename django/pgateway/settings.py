@@ -12,10 +12,12 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",
     "api",
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "pgateway.urls"
@@ -28,3 +30,5 @@ WSGI_APPLICATION = "pgateway.wsgi.application"
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
 
 STATIC_URL = "/static/"
+
+CORS_ALLOW_ALL_ORIGINS = True

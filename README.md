@@ -34,14 +34,12 @@ Obs.: Caso você receba um erro do tipo "Unable to resolve the current Docker CL
 
 ```shell
 docker build -t django-app:latest ./django
-docker build -t react-frontend:latest ./frontend
 docker build -t nodejs-node-server:latest ./nodejs
 ```
 
 ### 4. Carregar as imagens no Minikube
 ```shell
 minikube image load django-app:latest
-minikube image load react-frontend:latest
 minikube image load nodejs-node-server:latest
 ```
 
@@ -50,22 +48,29 @@ minikube image load nodejs-node-server:latest
 ```shell
 kubectl apply -f kubernetes/django-deployment.yaml
 kubectl apply -f kubernetes/django-service.yaml
-kubectl apply -f kubernetes/frontend-deployment.yaml
-kubectl apply -f kubernetes/frontend-service.yaml
 kubectl apply -f kubernetes/nodejs-deployment.yaml
 kubectl apply -f kubernetes/nodejs-service.yaml
 ```
-
-6. Obter o IP do Minikube
+6. Deixar porta da api acessível à sua máquina local
 
 ```shell
-minikube ip
+kubectl port-forward service/django-service 8000:8000
 ```
 
-O frontend estará disponível neste IP.
+7. Rodar o frontend
+
+Em um terminal separado, no diretório raiz do projeto rode os comandos abaixo
+
+```shell
+cd frontend
+npm install
+npm start
+```
+
+Acesse a URL abaixo no browser para acessar a aplicação:
 
 ```
-http://<minikube-ip>:30081
+http://localhost:8000
 ```
 
 ### 🛑 Como parar e remover a aplicação
@@ -75,8 +80,6 @@ http://<minikube-ip>:30081
 ```shell
 kubectl delete -f kubernetes/django-deployment.yaml 
 kubectl delete -f kubernetes/django-service.yaml
-kubectl delete -f kubernetes/frontend-deployment.yaml 
-kubectl delete -f kubernetes/frontend-service.yaml
 kubectl delete -f kubernetes/nodejs-deployment.yaml
 kubectl delete -f kubernetes/nodejs-service.yaml
 ```
