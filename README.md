@@ -1,3 +1,7 @@
+# Link do Vídeo Elaborado pela Equipe
+
+[Link Youtube](https://www.youtube.com/watch?v=oCK-Ol50Rj8)
+
 # 🚀 Guia para rodar a aplicação com Minikube e Kubernetes
 
 Este guia descreve como configurar e executar a aplicação utilizando **Minikube** e **Kubernetes**.

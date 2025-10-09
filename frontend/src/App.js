@@ -47,7 +47,7 @@ function App() {
         color: "#0CF25D",
       }}
     >
-      <h2>Inverte Palavras (Servidor Django)</h2>
+      <h2>Inverte Palavras (Servidor NodeJS)</h2>
       <form onSubmit={handleSubmit}>
         <input
           value={input}
