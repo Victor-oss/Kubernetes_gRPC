@@ -8,7 +8,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. ../grpc/service.proto || true
+# Stubs are committed in django/grpc_utils; to regenerate, use protos/image.proto
+# Example (run manually during development, not in image build):
+# python -m grpc_tools.protoc -I ../protos --python_out=./grpc_utils --grpc_python_out=./grpc_utils ../protos/image.proto
 
 EXPOSE 8000
 

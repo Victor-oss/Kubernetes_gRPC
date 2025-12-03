@@ -1,7 +1,6 @@
 from django.urls import path
-from .views import invert, add_numbers
+from .views import GatewayView
 
 urlpatterns = [
-    path("invert/", invert),
-    path("sum/", add_numbers),
+    path("gateway/", GatewayView.as_view()),
 ]

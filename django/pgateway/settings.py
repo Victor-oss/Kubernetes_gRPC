@@ -11,6 +11,7 @@ ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",
+    "rest_framework",
     "api",
     'corsheaders',
 ]
@@ -32,3 +33,10 @@ DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DI
 STATIC_URL = "/static/"
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Configurações do Django Rest Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [],
+    'UNAUTHENTICATED_USER': None,
+}

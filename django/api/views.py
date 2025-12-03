@@ -1,36 +1,48 @@
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-import service_pb2
-import service_pb2_grpc
-import sum_pb2
-import sum_pb2_grpc
+from django.http import HttpResponse, JsonResponse
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 import grpc
+# Importando da pasta onde geramos os arquivos
+from grpc_utils import image_pb2, image_pb2_grpc
 
-@csrf_exempt
-def invert(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        user_input = data.get("text", "")
+CHUNK_SIZE = 64 * 1024 # 64KB por pedaço
 
-        channel = grpc.insecure_channel('nodejs-service:50051')
-        stub = service_pb2_grpc.InverterStub(channel)
-        req = service_pb2.InvertRequest(name=user_input)
-        resp = stub.Invert(req, timeout=5)
+def generate_chunks(file_obj, operation):
+    """Função geradora que envia metadados primeiro, depois pedaços do arquivo."""
+    
+    # 1. Primeiro envio: Metadados
+    metadata = image_pb2.ImageMetadata(operation=operation, file_type="jpg")
+    yield image_pb2.ImageUploadRequest(metadata=metadata)
 
-        return JsonResponse({"message": resp.message})
+    # 2. Envios seguintes: Chunks de dados
+    while True:
+        chunk = file_obj.read(CHUNK_SIZE)
+        if not chunk:
+            break
+        yield image_pb2.ImageUploadRequest(chunk_data=chunk)
 
-    return JsonResponse({"error": "POST required"}, status=400)
+class GatewayView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
 
-@csrf_exempt
-def add_numbers(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        a = int(data.get("a", 0))
-        b = int(data.get("b", 0))
+    def post(self, request):
+        if 'image' not in request.FILES:
+            return JsonResponse({'error': 'Nenhuma imagem enviada'}, status=400)
 
-        channel = grpc.insecure_channel("java-grpc-service:50052")
-        stub = sum_pb2_grpc.SumServiceStub(channel)
-        response = stub.Add(sum_pb2.AddRequest(a=a, b=b))
+        uploaded_file = request.FILES['image']
+        filter_type = request.data.get('filter', 'grayscale')
 
-        return JsonResponse({"sum": response.sum})
+        try:
+            # Conexão gRPC (use o nome do service do k8s se estiver lá)
+            with grpc.insecure_channel('python-service:50052') as channel:
+                stub = image_pb2_grpc.ImageServiceStub(channel)
+                
+                # Chamada Streaming: Passamos o gerador (função) como argumento
+                response = stub.ProcessImage(generate_chunks(uploaded_file, filter_type))
+
+            if response.success:
+                return HttpResponse(response.image_data, content_type="image/jpeg")
+            else:
+                return JsonResponse({'error': response.error_message}, status=500)
+
+        except grpc.RpcError as e:
+            return JsonResponse({'error': f'Erro gRPC: {e.details()}'}, status=503)

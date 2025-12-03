@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package imageprocessing;
+
+service ImageService {
+  // Client-side Streaming: O cliente envia vários chunks, o servidor responde uma vez
+  rpc ProcessImage (stream ImageUploadRequest) returns (ImageResponse);
+}
+
+message ImageUploadRequest {
+  // Usamos 'oneof' para que a primeira mensagem seja os metadados e as seguintes sejam os bytes
+  oneof data {
+    ImageMetadata metadata = 1;
+    bytes chunk_data = 2;
+  }
+}
+
+message ImageMetadata {
+  string operation = 1; // Ex: "grayscale"
+  string file_type = 2; // Ex: "jpg"
+}
+
+message ImageResponse {
+  bytes image_data = 1;
+  bool success = 2;
+  string error_message = 3;
+}

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-image-processor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-image-processor
+  template:
+    metadata:
+      labels:
+        app: python-image-processor
+    spec:
+      containers:
+        - name: python-image-processor
+          image: python-image-service:latest  # Nome da imagem que vamos construir
+          imagePullPolicy: Never              # Usa a imagem local
+          ports:
+            - containerPort: 50052
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-service  # O nome exato que o Django procura!
+spec:
+  selector:
+    app: python-image-processor
+  ports:
+    - protocol: TCP
+      port: 50052
+      targetPort: 50052

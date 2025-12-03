@@ -2,9 +2,29 @@
 
 [Link Youtube](https://www.youtube.com/watch?v=oCK-Ol50Rj8)
 
-# 🚀 Guia para rodar a aplicação com Minikube e Kubernetes
+# 🚀 Processador de Imagens com gRPC Streaming, Django e Kubernetes
 
-Este guia descreve como configurar e executar a aplicação utilizando **Minikube** e **Kubernetes**.
+Esta aplicação demonstra uma arquitetura de microserviços para processamento de imagens utilizando **gRPC Streaming**, **Django REST Framework**, **Python/OpenCV** e **Kubernetes**.
+
+## 🎯 Arquitetura
+
+```
+Frontend (React)
+	↓ HTTP POST (multipart/form-data)
+Django Gateway API (REST)
+	↓ gRPC Client-side Streaming (chunks de 64KB)
+Python Worker (OpenCV)
+	↓ Processamento (grayscale, blur, edge, resize)
+	↓ Retorno da imagem processada
+Frontend ← Exibe resultado
+```
+
+### Componentes:
+
+- **Frontend (React)**: Interface web para upload e visualização de imagens
+- **Django Gateway**: API REST que recebe uploads e faz streaming via gRPC
+- **Python Image Processor**: Serviço gRPC que processa imagens com OpenCV
+- **Kubernetes**: Orquestração dos serviços backend
 
 ---
 
@@ -14,8 +34,8 @@ Antes de começar, é necessário instalar as seguintes ferramentas:
 
 - [Minikube](https://minikube.sigs.k8s.io/docs/start/)  
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
-
-Além disso, você deve ter o **Docker** instalado em sua máquina, já que as imagens da aplicação serão construídas localmente.
+- [Docker](https://docs.docker.com/get-docker/)
+- [Node.js](https://nodejs.org/) (para o frontend React)
 
 ---
 
@@ -26,48 +46,48 @@ Além disso, você deve ter o **Docker** instalado em sua máquina, já que as i
 ```shell
 minikube start
 ```
-### 2. Configurar o ambiente Docker do Minikube
 
-```shell
-eval $(minikube docker-env)
-```
-
-Obs.: Caso você receba um erro do tipo "Unable to resolve the current Docker CLI...", dê o comando acima novamente até não retornar nenhuma mensagem de erro. Caso não funcione, publique as imagens no docker hub
-
-### 3. Construir as imagens Docker
+### 2. Construir as imagens Docker
 
 ```shell
 docker build -t django-app:latest ./django
-docker build -t nodejs-node-server:latest ./nodejs
-docker build -t java-server:latest ./java
+docker build -t python-image-service:latest ./python_image
 ```
 
-### 4. Carregar as imagens no Minikube
+### 3. Carregar as imagens no Minikube
+
 ```shell
 minikube image load django-app:latest
-minikube image load nodejs-node-server:latest
-minikube image load java-server:latest
+minikube image load python-image-service:latest
 ```
 
-### 5. Aplicar os manifests do Kubernetes
+### 4. Aplicar os deployments do Kubernetes
 
 ```shell
 kubectl apply -f kubernetes/django-deployment.yaml
 kubectl apply -f kubernetes/django-service.yaml
-kubectl apply -f kubernetes/nodejs-deployment.yaml
-kubectl apply -f kubernetes/nodejs-service.yaml
-kubectl apply -f kubernetes/java-deployment.yaml
-kubectl apply -f kubernetes/java-service.yaml
+kubectl apply -f kubernetes/python-deployment.yaml
 ```
-6. Deixar porta da api acessível à sua máquina local
+
+### 5. Verificar se os pods estão rodando
 
 ```shell
-kubectl port-forward service/django-service 8000:8000
+kubectl get pods
 ```
 
-7. Rodar o frontend
+Aguarde até que todos os pods estejam com status `Running`.
 
-Em um terminal separado, no diretório raiz do projeto rode os comandos abaixo
+### 6. Obter o IP do Minikube
+
+```shell
+minikube ip
+```
+
+A API Django estará acessível em `http://<MINIKUBE_IP>:30080`
+
+### 7. Rodar o frontend (local)
+
+Em um terminal separado:
 
 ```shell
 cd frontend
@@ -75,11 +95,33 @@ npm install
 npm start
 ```
 
-Acesse a URL abaixo no browser para acessar a aplicação:
+O frontend abrirá automaticamente em:
 
 ```
-http://localhost:8000
+http://localhost:3000
 ```
+
+### 8. Testar a aplicação
+
+1. Acesse `http://localhost:3000` no navegador
+2. Selecione uma imagem
+3. Escolha um filtro (Escala de Cinza, Desfoque, Bordas, ou Reduzir Tamanho)
+4. Clique em "Enviar e Processar"
+5. A imagem processada será exibida abaixo
+
+---
+
+## 🔍 Verificar logs
+
+```shell
+# Logs do Django
+kubectl logs -l app=django --tail=50
+
+# Logs do Python
+kubectl logs -l app=python-image-processor --tail=50
+```
+
+---
 
 ### 🛑 Como parar e remover a aplicação
 
@@ -88,10 +130,7 @@ http://localhost:8000
 ```shell
 kubectl delete -f kubernetes/django-deployment.yaml 
 kubectl delete -f kubernetes/django-service.yaml
-kubectl delete -f kubernetes/nodejs-deployment.yaml
-kubectl delete -f kubernetes/nodejs-service.yaml
-kubectl delete -f kubernetes/java-deployment.yaml
-kubectl delete -f kubernetes/java-service.yaml
+kubectl delete -f kubernetes/python-deployment.yaml
 ```
 
 2. Parar o Minikube
@@ -104,4 +143,25 @@ minikube stop
 
 ```shell
 minikube delete
+
+---
+
+## 📚 Tecnologias Utilizadas
+
+- **Frontend**: React 19, JavaScript
+- **Backend Gateway**: Django 4.2, Django REST Framework, django-cors-headers
+- **Image Processor**: Python 3.9, gRPC, OpenCV, NumPy
+- **Protocolo**: gRPC com Client-side Streaming
+- **Containerização**: Docker
+- **Orquestração**: Kubernetes (Minikube)
+
+---
+
+## 📝 Notas Técnicas
+
+- **Streaming gRPC**: O upload é feito em chunks de 64KB para otimizar memória
+- **CORS**: Configurado para aceitar requisições do frontend local
+- **NodePort**: Django exposto na porta 30080 do Minikube
+- **ClusterIP**: Python acessível apenas internamente como `python-service:50052`
+
 ```

@@ -1,81 +1,89 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import './App.css';
 
 function App() {
-  const [input, setInput] = useState("");
-  const [message, setMessage] = useState("");
-  const [num1, setNum1] = useState("");
-  const [num2, setNum2] = useState("");
-  const [messageSoma, setMessageSoma] = useState("")
+  // Estados para armazenar o arquivo e o filtro selecionado
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filter, setFilter] = useState('grayscale');
+  const [processedImage, setProcessedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetch("http://localhost:8000/api/invert/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: input })
-    })
-      .then(r => r.json())
-      .then(data => setMessage(data.message))
-      .catch(err => setMessage("Error: " + err.message));
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
   };
 
-  const handleSubmitSoma = (e) => {
-    e.preventDefault();
-    if (isNaN(num1) || isNaN(num2) || num1 === "" || num2 === "") {
-      setMessageSoma("Por favor, digite apenas números.");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!selectedFile) {
+      alert("Por favor, selecione uma imagem!");
       return;
     }
 
-    fetch("http://localhost:8000/api/sum/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ a: num1, b: num2 })
-    })
-      .then(r => r.json())
-      .then(data => setMessageSoma(data.sum))
-      .catch(err => setMessageSoma("Error: " + err.message));
+    setLoading(true);
+    
+    // Usamos FormData para enviar arquivos binários
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+    formData.append('filter', filter);
+
+    try {
+      const response = await fetch('http://192.168.49.2:30080/api/gateway/', {
+        method: 'POST',
+        body: formData, // O browser define o Content-Type automaticamente para multipart/form-data
+      });
+
+      if (response.ok) {
+        // Recebemos a imagem processada como Blob (objeto binário)
+        const imageBlob = await response.blob();
+        // Criamos uma URL temporária para exibir a imagem
+        const imageUrl = URL.createObjectURL(imageBlob);
+        setProcessedImage(imageUrl);
+      } else {
+        alert('Erro ao processar imagem.');
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro de conexão.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div
-      style={{
-        paddingTop: "2rem",
-        textAlign: "center",
-        width: "100%",
-        height: "100vh",
-        backgroundColor: "#005C53",
-        color: "#0CF25D",
-      }}
-    >
-      <h2>Inverte Palavras (Servidor NodeJS)</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          value={input}
-          onChange={(ev) => setInput(ev.target.value)}
-          placeholder="Digite uma palavra"
-          style={{ padding: "0.5rem", marginRight: "0.5rem" }}
-        />
-        <button type="submit">Inverter</button>
-      </form>
-      {message && <h2>Resultado: {message}</h2>}
+    <div className="App">
+      <header className="App-header">
+        <h1>Processador de Imagens gRPC</h1>
+        
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          
+          {/* Input de Arquivo */}
+          <input 
+            type="file" 
+            accept="image/*" 
+            onChange={handleFileChange} 
+          />
 
-      <h2>Soma (Servidor Java)</h2>
-      <form onSubmit={handleSubmitSoma}>
-        <input
-          value={num1}
-          onChange={(ev) => setNum1(ev.target.value)}
-          placeholder="Digite um número"
-          style={{ padding: "0.5rem", marginRight: "0.5rem" }}
-        />
-        <input
-          value={num2}
-          onChange={(ev) => setNum2(ev.target.value)}
-          placeholder="Digite um número"
-          style={{ padding: "0.5rem", marginRight: "0.5rem" }}
-        />
-        <button type="submit">Somar</button>
-      </form>
-      {messageSoma && <h2>Resultado: {messageSoma}</h2>}
+          {/* Seleção de Filtro */}
+          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="grayscale">Escala de Cinza</option>
+            <option value="blur">Desfoque (Blur)</option>
+            <option value="edge">Bordas</option>
+            <option value="resize">Reduzir Tamanho (50%)</option>
+          </select>
+
+          <button type="submit" disabled={loading}>
+            {loading ? 'Processando...' : 'Enviar e Processar'}
+          </button>
+        </form>
+
+        {/* Exibição do Resultado */}
+        {processedImage && (
+          <div style={{ marginTop: '20px' }}>
+            <h3>Resultado:</h3>
+            <img src={processedImage} alt="Processada" style={{ maxWidth: '100%', border: '2px solid white' }} />
+          </div>
+        )}
+      </header>
     </div>
   );
 }
