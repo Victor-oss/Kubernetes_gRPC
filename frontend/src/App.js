@@ -1,39 +1,66 @@
 import React, { useState } from "react";
 
 function App() {
-  const [input, setInput] = useState("");
-  const [message, setMessage] = useState("");
-  const [num1, setNum1] = useState("");
-  const [num2, setNum2] = useState("");
-  const [messageSoma, setMessageSoma] = useState("")
+  const [n, setN] = useState("");
+  const [messageFib, setFib] = useState("")
+  const [file, setFile] = useState(null);
+  const [fibonacciResults, setFibonacciResults] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmitFibSingle = (e) => {
     e.preventDefault();
-    fetch("http://localhost:8000/api/invert/", {
+    if (isNaN(n) || n === "") {
+      setFib("Por favor, digite apenas números.");
+      return;
+    }
+    fetch("http://localhost:8000/api/fib/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: input })
+      body: JSON.stringify({ n: n })
     })
       .then(r => r.json())
-      .then(data => setMessage(data.message))
-      .catch(err => setMessage("Error: " + err.message));
+      .then(data => setFib(data.fibonacci))
+      .catch(err => setFib("Erro: " + err.message));
   };
 
-  const handleSubmitSoma = (e) => {
+  const handleFileChange = (e) => {
+
+    setFile(e.target.files[0]);
+
+    setFibonacciResults([]);
+
+    setErrorMessage("");
+
+  };
+
+
+
+  const handleSubmitFibMany = (e) => {
     e.preventDefault();
-    if (isNaN(num1) || isNaN(num2) || num1 === "" || num2 === "") {
-      setMessageSoma("Por favor, digite apenas números.");
+
+    if (!file) {
+      setErrorMessage("Por favor, selecione um arquivo Excel.");
       return;
     }
 
-    fetch("http://localhost:8000/api/sum/", {
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    fetch("http://localhost:8000/api/fib-lote/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ a: num1, b: num2 })
+      body: formData
     })
       .then(r => r.json())
-      .then(data => setMessageSoma(data.sum))
-      .catch(err => setMessageSoma("Error: " + err.message));
+      .then(data => {
+        if (data.error) {
+          setErrorMessage(data.error);
+        } else {
+          setFibonacciResults(data.fibonacci_results);
+          setErrorMessage("");
+        }
+      })
+      .catch(err => setErrorMessage("Erro: " + err.message));
   };
 
   return (
@@ -47,35 +74,69 @@ function App() {
         color: "#0CF25D",
       }}
     >
-      <h2>Inverte Palavras (Servidor NodeJS)</h2>
-      <form onSubmit={handleSubmit}>
+      <p>Insira um número n e obtenha o n-ésimo número de Fibonacci (Servidor NodeJS)</p>
+      <form onSubmit={handleSubmitFibSingle}>
         <input
-          value={input}
-          onChange={(ev) => setInput(ev.target.value)}
-          placeholder="Digite uma palavra"
+          value={n}
+          onChange={(ev) => setN(ev.target.value)}
+          placeholder="Digite um número"
           style={{ padding: "0.5rem", marginRight: "0.5rem" }}
         />
-        <button type="submit">Inverter</button>
+        <button type="submit">Executar</button>
       </form>
-      {message && <h2>Resultado: {message}</h2>}
+      {messageFib && <h2>Resultado: {messageFib}</h2>}
 
-      <h2>Soma (Servidor Java)</h2>
-      <form onSubmit={handleSubmitSoma}>
+      <hr style={{ margin: "2rem 0", borderColor: "#0CF25D" }} />
+
+
+
+      <p>Upload de arquivo Excel para calcular Fibonacci em lote</p>
+
+      <form onSubmit={handleSubmitFibMany}>
+
         <input
-          value={num1}
-          onChange={(ev) => setNum1(ev.target.value)}
-          placeholder="Digite um número"
+
+          type="file"
+
+          accept=".xlsx,.xls"
+
+          onChange={handleFileChange}
+
           style={{ padding: "0.5rem", marginRight: "0.5rem" }}
+
         />
-        <input
-          value={num2}
-          onChange={(ev) => setNum2(ev.target.value)}
-          placeholder="Digite um número"
-          style={{ padding: "0.5rem", marginRight: "0.5rem" }}
-        />
-        <button type="submit">Somar</button>
+
+        <button type="submit">Processar Excel</button>
+
       </form>
-      {messageSoma && <h2>Resultado: {messageSoma}</h2>}
+
+      {errorMessage && <h3 style={{ color: "red" }}>{errorMessage}</h3>}
+      {fibonacciResults.length > 0 && (
+        <div style={{ marginTop: "2rem", padding: "1rem" }}>
+          <h2>Resultados:</h2>
+          <table style={{
+            margin: "0 auto",
+            borderCollapse: "collapse",
+            backgroundColor: "#003d36",
+            color: "#0CF25D"
+          }}>
+            <thead>
+              <tr>
+                <th style={{ border: "1px solid #0CF25D", padding: "0.5rem" }}>Número</th>
+                <th style={{ border: "1px solid #0CF25D", padding: "0.5rem" }}>Fibonacci</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fibonacciResults.map((result, index) => (
+                <tr key={index}>
+                  <td style={{ border: "1px solid #0CF25D", padding: "0.5rem" }}>{result.input}</td>
+                  <td style={{ border: "1px solid #0CF25D", padding: "0.5rem" }}>{result.fibonacci}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

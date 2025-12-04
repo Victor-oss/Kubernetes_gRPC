@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_package = "com.example.number_extractor";
+option java_multiple_files = true;
+
+service NumberExtractorService {
+  rpc ExtractNumbers (ExcelRequest) returns (ExcelResponse);
+}
+
+message ExcelRequest {
+  bytes file = 1;
+}
+
+message ExcelResponse {
+  repeated int32 numbers = 1;
+}
