@@ -16,6 +16,7 @@ import java.util.List;
 
 public class NumberExtractorServer {
     public static void main(String[] args) throws Exception {
+        MetricsServer.start();
         Server server = ServerBuilder.forPort(50052)
                 .addService(new NumberExtractorServiceImpl())
                 .build()

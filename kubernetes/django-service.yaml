@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: django-service
+  labels:
+    app: django
 spec:
   selector:
     app: django
@@ -10,4 +12,5 @@ spec:
     - port: 8000
       targetPort: 8000
       nodePort: 30080
+      name: http
 

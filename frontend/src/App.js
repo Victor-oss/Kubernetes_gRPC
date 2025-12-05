@@ -74,7 +74,7 @@ function App() {
         color: "#0CF25D",
       }}
     >
-      <p>Insira um número n e obtenha o n-ésimo número de Fibonacci (Servidor NodeJS)</p>
+      <p>Insira um número n e obtenha o n-ésimo número de Fibonacci</p>
       <form onSubmit={handleSubmitFibSingle}>
         <input
           value={n}

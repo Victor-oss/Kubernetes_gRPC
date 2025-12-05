@@ -1,3 +1,7 @@
+const express = require('express');
+const client = require('prom-client');
+client.collectDefaultMetrics();
+
 const path = require('path');
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
@@ -55,3 +59,14 @@ function main() {
 }
 
 main();
+
+const metricsApp = express();
+metricsApp.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
+});
+
+// Porta diferente do Java
+metricsApp.listen(50053, () => {
+  console.log('Node.js metrics server running on port 50053');
+});

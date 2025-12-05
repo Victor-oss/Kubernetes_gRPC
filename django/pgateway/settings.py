@@ -13,11 +13,14 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "api",
     'corsheaders',
+    'django_prometheus',
 ]
 
 MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     'corsheaders.middleware.CorsMiddleware',
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = "pgateway.urls"
@@ -32,3 +35,4 @@ DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DI
 STATIC_URL = "/static/"
 
 CORS_ALLOW_ALL_ORIGINS = True
+PROMETHEUS_EXPORT_MIGRATIONS = True
