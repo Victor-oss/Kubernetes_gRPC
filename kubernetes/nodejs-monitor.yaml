@@ -22,4 +22,3 @@ spec:
         match[]:
           - '{job!=""}'
   jobLabel: app
-      interval: 15s
