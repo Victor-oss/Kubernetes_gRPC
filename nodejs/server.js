@@ -1,5 +1,6 @@
 const express = require('express');
 const client = require('prom-client');
+const reflection = require('@grpc/reflection');
 client.collectDefaultMetrics();
 
 const path = require('path');
@@ -43,6 +44,16 @@ function main() {
   const server = new grpc.Server();
   server.addService(fibPackage.Fibonacci.service, { Fibonacci: fibonacciHandler });
   
+   const reflectionV1 = reflection.buildServerReflectionProtocol(
+    'grpc.reflection.v1.ServerReflection',
+    server
+  );
+  const reflectionV1alpha = reflection.buildServerReflectionProtocol(
+    'grpc.reflection.v1alpha.ServerReflection', 
+    server
+  );
+
+
   const addr = '0.0.0.0:50051';
   server.bindAsync(
     addr,
@@ -53,7 +64,7 @@ function main() {
         return;
       }
       console.log(`gRPC server listening on ${addr}`);
-      server.start();
+      // SEM server.start() - NÃO É MAIS NECESSÁRIO!
     }
   );
 }

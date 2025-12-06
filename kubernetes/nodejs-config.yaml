@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nodejs-config
+data:
+  NODE_ENV: production
+  GRPC_MAX_MESSAGE_LENGTH: "104857600"  # 100MB
+  GRPC_KEEPALIVE_TIME_MS: "60000"

@@ -5,6 +5,7 @@ metadata:
   namespace: monitoring
   labels:
     release: monitoring
+    app: nodejs
 spec:
   namespaceSelector:
     any: true
@@ -14,4 +15,11 @@ spec:
   endpoints:
     - port: metrics
       path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      honorLabels: true
+      params:
+        match[]:
+          - '{job!=""}'
+  jobLabel: app
       interval: 15s
