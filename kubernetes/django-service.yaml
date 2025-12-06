@@ -13,4 +13,3 @@ spec:
       targetPort: 8000
       nodePort: 30080
       name: http
-
