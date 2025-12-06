@@ -130,18 +130,25 @@ Acesse o endereço http://localhost:3001 e depois faça login com o usuário adm
 1. Deletar os recursos do Kubernetes
 
 ```shell
+kubectl delete -f kubernetes/django-config.yaml
 kubectl delete -f kubernetes/django-deployment.yaml 
 kubectl delete -f kubernetes/django-service.yaml
+kubectl delete -f kubernetes/django-hpa.yaml
+kubectl delete -f kubernetes/nodejs-config.yaml
+kubectl delete -f kubernetes/nodejs-pvc.yaml
 kubectl delete -f kubernetes/nodejs-deployment.yaml
 kubectl delete -f kubernetes/nodejs-service.yaml
+kubectl delete -f kubernetes/nodejs-hpa.yaml
+kubectl delete -f kubernetes/nodejs-pdb.yaml
 kubectl delete -f kubernetes/java-deployment.yaml
 kubectl delete -f kubernetes/java-service.yaml
+kubectl delete -f kubernetes/java-hpa.yaml
 kubectl delete -f kubernetes/django-monitor.yaml
 kubectl delete -f kubernetes/java-monitor.yml
 kubectl delete -f kubernetes/nodejs-monitor.yaml
 ```
 
-2. Parar o Minikube
+1. Parar o Minikube
 
 ```shell
 minikube stop
