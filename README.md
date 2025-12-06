@@ -70,15 +70,22 @@ helm install monitoring prometheus-community/kube-prometheus-stack \
 ```
 
 ```shell
+kubectl apply -f kubernetes/django-config.yaml
 kubectl apply -f kubernetes/django-deployment.yaml
 kubectl apply -f kubernetes/django-service.yaml
+kubectl apply -f kubernetes/django-hpa.yaml
+kubectl apply -f kubernetes/nodejs-config.yaml
+kubectl apply -f kubernetes/nodejs-pvc.yaml
 kubectl apply -f kubernetes/nodejs-deployment.yaml
 kubectl apply -f kubernetes/nodejs-service.yaml
+kubectl apply -f kubernetes/nodejs-hpa.yaml
+kubectl apply -f kubernetes/nodejs-pdb.yaml
 kubectl apply -f kubernetes/java-deployment.yaml
 kubectl apply -f kubernetes/java-service.yaml
+kubectl apply -f kubernetes/java-hpa.yaml
 kubectl apply -f kubernetes/django-monitor.yaml
 kubectl apply -f kubernetes/java-monitor.yml
-kubectl apply -f kubernetes/nodejs-monitor.yml
+kubectl apply -f kubernetes/nodejs-monitor.yaml
 ```
 6. Deixar porta da api acessível à sua máquina local
 
@@ -131,7 +138,7 @@ kubectl delete -f kubernetes/java-deployment.yaml
 kubectl delete -f kubernetes/java-service.yaml
 kubectl delete -f kubernetes/django-monitor.yaml
 kubectl delete -f kubernetes/java-monitor.yml
-kubectl delete -f kubernetes/nodejs-monitor.yml
+kubectl delete -f kubernetes/nodejs-monitor.yaml
 ```
 
 2. Parar o Minikube
