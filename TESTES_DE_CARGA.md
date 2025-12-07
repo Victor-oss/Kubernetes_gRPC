@@ -93,3 +93,20 @@ O Java pod ficou com CPU baixa na maior parte do tempo, mas sofreu rajadas curta
 Memória estável e baixa (< 140 Mi), sem sinais de leak.
 
 ---
+
+Cenario 2 - Alta Carga
+========================
+Carga: 50 usuários
+Duração: 2 minutos
+spawn rate: 2 
+wait_times: 1–3s e 0.5–1s (mix dos dois perfis).
+
+Numeros entre 20 e 70
+
+comando locust:
+```bash
+ locust -f locustfile.py --host http://localhost:8000         --users 50 --spawn-rate 2 --run-time 2m --headless       --csv=scenario2_high_numbers
+```
+
+
+
