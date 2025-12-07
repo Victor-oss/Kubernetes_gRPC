@@ -1,6 +1,5 @@
 const express = require('express');
 const client = require('prom-client');
-const reflection = require('@grpc/reflection');
 client.collectDefaultMetrics();
 
 const path = require('path');
@@ -43,16 +42,6 @@ function fibonacciHandler(call, callback) {
 function main() {
   const server = new grpc.Server();
   server.addService(fibPackage.Fibonacci.service, { Fibonacci: fibonacciHandler });
-  
-   const reflectionV1 = reflection.buildServerReflectionProtocol(
-    'grpc.reflection.v1.ServerReflection',
-    server
-  );
-  const reflectionV1alpha = reflection.buildServerReflectionProtocol(
-    'grpc.reflection.v1alpha.ServerReflection', 
-    server
-  );
-
 
   const addr = '0.0.0.0:50051';
   server.bindAsync(
