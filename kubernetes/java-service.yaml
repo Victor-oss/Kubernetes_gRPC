@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: java-grpc-service
+  labels:
+    app: java-grpc-server 
 spec:
   selector:
     app: java-grpc-server
@@ -9,3 +11,7 @@ spec:
     - protocol: TCP
       port: 50052
       targetPort: 50052
+      name: grpc
+    - port: 50054
+      targetPort: 50054
+      name: metrics

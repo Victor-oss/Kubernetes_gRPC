@@ -3,34 +3,59 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import service_pb2
 import service_pb2_grpc
-import sum_pb2
-import sum_pb2_grpc
+import number_extractor_pb2
+import number_extractor_pb2_grpc
 import grpc
 
 @csrf_exempt
-def invert(request):
+def fibonacci_many(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        user_input = data.get("text", "")
+        excel_file = request.FILES.get('file')
+        if not excel_file:
+            return JsonResponse({"error": "Forneça um arquivo"}, status=400)
 
-        channel = grpc.insecure_channel('nodejs-service:50051')
-        stub = service_pb2_grpc.InverterStub(channel)
-        req = service_pb2.InvertRequest(name=user_input)
-        resp = stub.Invert(req, timeout=5)
+        file_bytes = excel_file.read()
 
-        return JsonResponse({"message": resp.message})
+        java_channel = grpc.insecure_channel("java-grpc-service:50052")
+        java_stub = number_extractor_pb2_grpc.NumberExtractorServiceStub(java_channel)
+        extract_response = java_stub.ExtractNumbers(
+            number_extractor_pb2.ExcelRequest(file=file_bytes)
+        )
+
+        numbers = list(extract_response.numbers)
+        
+        fibonacci_results = []
+        for num in numbers:
+            nodejs_channel = grpc.insecure_channel('nodejs-service:50051')
+            nodejs_stub = service_pb2_grpc.FibonacciStub(nodejs_channel)
+            fib_response = nodejs_stub.Fibonacci(
+                service_pb2.FibonacciRequest(n=num),
+                timeout=5
+            )
+            fibonacci_results.append({
+                "input": num,
+                "fibonacci": int(fib_response.value)
+            })
+            nodejs_channel.close()
+        
+        java_channel.close()
+        
+        return JsonResponse({
+            "fibonacci_results": fibonacci_results
+        })
 
     return JsonResponse({"error": "POST required"}, status=400)
 
 @csrf_exempt
-def add_numbers(request):
+def fibonacci_single(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        a = int(data.get("a", 0))
-        b = int(data.get("b", 0))
+        n = int(data.get("n", 0))
 
-        channel = grpc.insecure_channel("java-grpc-service:50052")
-        stub = sum_pb2_grpc.SumServiceStub(channel)
-        response = stub.Add(sum_pb2.AddRequest(a=a, b=b))
+        channel = grpc.insecure_channel('nodejs-service:50051')
+        stub = service_pb2_grpc.FibonacciStub(channel)
+        response = stub.Fibonacci(service_pb2.FibonacciRequest(n=n))
 
-        return JsonResponse({"sum": response.sum})
+        channel.close()
+        return JsonResponse({"fibonacci": response.value})
+    return JsonResponse({"error": "POST required"}, status=400)

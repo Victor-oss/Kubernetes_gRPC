@@ -1,15 +1,15 @@
 syntax = "proto3";
 
-package inverter;
+package fibonacci;
 
-service Inverter {
-  rpc Invert (InvertRequest) returns (InvertReply);
+service Fibonacci {
+  rpc Fibonacci (FibonacciRequest) returns (FibonacciReply);
 }
 
-message InvertRequest {
-  string name = 1;
+message FibonacciRequest {
+  int32 n = 1;
 }
 
-message InvertReply {
-  string message = 1;
+message FibonacciReply {
+  int64 value = 1;
 }

@@ -25,7 +25,7 @@ if _version_not_supported:
     )
 
 
-class InverterStub(object):
+class FibonacciStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,43 +34,43 @@ class InverterStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Invert = channel.unary_unary(
-                '/inverter.Inverter/Invert',
-                request_serializer=service__pb2.InvertRequest.SerializeToString,
-                response_deserializer=service__pb2.InvertReply.FromString,
+        self.Fibonacci = channel.unary_unary(
+                '/fibonacci.Fibonacci/Fibonacci',
+                request_serializer=service__pb2.FibonacciRequest.SerializeToString,
+                response_deserializer=service__pb2.FibonacciReply.FromString,
                 _registered_method=True)
 
 
-class InverterServicer(object):
+class FibonacciServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def Invert(self, request, context):
+    def Fibonacci(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_InverterServicer_to_server(servicer, server):
+def add_FibonacciServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Invert': grpc.unary_unary_rpc_method_handler(
-                    servicer.Invert,
-                    request_deserializer=service__pb2.InvertRequest.FromString,
-                    response_serializer=service__pb2.InvertReply.SerializeToString,
+            'Fibonacci': grpc.unary_unary_rpc_method_handler(
+                    servicer.Fibonacci,
+                    request_deserializer=service__pb2.FibonacciRequest.FromString,
+                    response_serializer=service__pb2.FibonacciReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'inverter.Inverter', rpc_method_handlers)
+            'fibonacci.Fibonacci', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('inverter.Inverter', rpc_method_handlers)
+    server.add_registered_method_handlers('fibonacci.Fibonacci', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class Inverter(object):
+class Fibonacci(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Invert(request,
+    def Fibonacci(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +83,9 @@ class Inverter(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/inverter.Inverter/Invert',
-            service__pb2.InvertRequest.SerializeToString,
-            service__pb2.InvertReply.FromString,
+            '/fibonacci.Fibonacci/Fibonacci',
+            service__pb2.FibonacciRequest.SerializeToString,
+            service__pb2.FibonacciReply.FromString,
             options,
             channel_credentials,
             insecure,

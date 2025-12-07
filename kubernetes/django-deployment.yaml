@@ -5,10 +5,15 @@ metadata:
   labels:
     app: django
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: django
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
   template:
     metadata:
       labels:
@@ -17,6 +22,43 @@ spec:
       containers:
         - name: django
           image: django-app:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent 
           ports:
             - containerPort: 8000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: django-config
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - django
+                topologyKey: kubernetes.io/hostname

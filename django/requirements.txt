@@ -4,3 +4,4 @@ grpcio
 grpcio-tools
 requests 
 django-cors-headers
+django-prometheus
