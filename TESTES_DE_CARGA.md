@@ -109,4 +109,31 @@ comando locust:
 ```
 
 
+cenario 3 - Stress Test
+========================
+Carga: 100 usuários
+Duração: 2 minutos
+spawn rate: 5
+wait_time: 0s (sem espera entre requisições).
 
+numeros entre 50 e 100
+
+agora com autoscaling habilitado (HPA)
+
+ativar HPA novamente:
+
+```bash
+# Restaurar configuração original de HPA (2-8 réplicas)
+kubectl patch hpa django-hpa -p '{"spec":{"minReplicas":2,"maxReplicas":8}}'
+kubectl patch hpa nodejs-hpa -p '{"spec":{"minReplicas":2,"maxReplicas":8}}'
+kubectl patch hpa java-hpa -p '{"spec":{"minReplicas":2,"maxReplicas":8}}'
+
+# Verificar
+kubectl get hpa
+kubectl get pods -w
+```
+
+locust comando:
+```bash
+ locust -f locustfile.py --host http://localhost:8000         --users 100 --spawn-rate 5 --run-time 2m --headless       --csv=scenario3_stress_test
+```
